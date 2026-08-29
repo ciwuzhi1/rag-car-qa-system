@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>汽车知识问答系统 - 仪表板</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .header h2 {
+            color: #2c3e50;
+            margin: 0;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logout-btn {
+            padding: 8px 16px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .logout-btn:hover {
+            background-color: #c0392b;
+        }
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        .chart {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        @media (max-width: 768px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>汽车知识问答系统 - 数据统计</h2>
+        <div class="user-info">
+            <span>管理员</span>
+            <button class="logout-btn" onclick="logout()">退出登录</button>
+        </div>
+    </div>
+
+    <div class="charts-container">
+        <div class="chart" id="barChart"></div>
+        <div class="chart" id="lineChart"></div>
+    </div>
+
+    <script>
+        // 检查登录状态
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            window.location.href = 'login.html';
+        }
+
+        // 模拟数据 - 汽车知识问答系统的统计数据
+        const months = ['1月', '2月', '3月', '4月', '5月', '6月'];
+        const questionData = [150, 180, 220, 280, 320, 350]; // 问题数量
+        const userData = [100, 150, 200, 280, 350, 420]; // 用户数量
+
+        // 创建柱状图 - 问题数量统计
+        const barTrace = {
+            x: months,
+            y: questionData,
+            type: 'bar',
+            name: '问题数量',
+            marker: {
+                color: '#3498db'
+            }
+        };
+
+        const barLayout = {
+            title: '月度问题数量统计',
+            xaxis: { title: '月份' },
+            yaxis: { title: '问题数量' },
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)'
+        };
+
+        Plotly.newPlot('barChart', [barTrace], barLayout);
+
+        // 创建折线图 - 用户增长趋势
+        const lineTrace = {
+            x: months,
+            y: userData,
+            type: 'scatter',
+            mode: 'lines+markers',
+            name: '用户数',
+            line: {
+                color: '#2ecc71',
+                width: 3
+            },
+            marker: {
+                size: 8
+            }
+        };
+
+        const lineLayout = {
+            title: '用户增长趋势',
+            xaxis: { title: '月份' },
+            yaxis: { title: '用户数量' },
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)'
+        };
+
+        Plotly.newPlot('lineChart', [lineTrace], lineLayout);
+
+        // 退出登录功能
+        function logout() {
+            if (confirm('确定要退出登录吗？')) {
+                localStorage.removeItem('isLoggedIn');
+                window.location.href = 'login.html';
+            }
+        }
+    </script>
+</body>
+</html> 

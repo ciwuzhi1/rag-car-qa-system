@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>知识库管理 - 汽车知识问答系统</title>
+    <!-- 使用Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=3) }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light navbar-app">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <span class="logo">汽车知识</span> <span class="version">v2.0</span>
+            </a>
+            <div class="d-flex">
+                <a href="/admin" class="nav-link nav-strong">管理员 <span>admin</span></a>
+                <a href="/logout" class="nav-link nav-muted">退出登录</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <!-- 侧边栏 -->
+            <div class="col-md-2">
+                <div class="list-group">
+                    <div class="list-group-header">管理菜单</div>
+                    <a href="/admin" class="list-group-item list-group-item-action">📋 问题管理</a>
+                    <a href="/knowledge" class="list-group-item list-group-item-action active">📚 知识库管理</a>
+                    <a href="/upload_knowledge" class="list-group-item list-group-item-action">📥 导入知识</a>
+                    <a href="/api_keys" class="list-group-item list-group-item-action">🔑 API密钥配置</a>
+                    <a href="/" class="list-group-item list-group-item-action">🏠 返回前台</a>
+                </div>
+            </div>
+
+            <!-- 主内容区 -->
+            <div class="col-md-10">
+                <div class="card">
+                    <div class="card-header card-header-app">
+                        <h3 class="mb-0">知识库管理</h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- 操作按钮 -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="search-input" placeholder="搜索知识...">
+                                    <button class="btn btn-outline-secondary" type="button" id="search-button">搜索</button>
+                                </div>
+                            </div>
+                            <div class="col-md-6 d-flex justify-content-end">
+                                <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#addKnowledgeModal">添加知识</button>
+                                <button class="btn btn-warning me-2" id="export-button">导出知识库</button>
+                                <button class="btn btn-danger" id="clear-button">清空知识库</button>
+                            </div>
+                        </div>
+
+                        <!-- 知识列表 -->
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>问题</th>
+                                        <th>答案</th>
+                                        <th>关键词</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="knowledge-table-body">
+                                    {% for item in knowledge_base %}
+                                    <tr>
+                                        <td>{{ item.id }}</td>
+                                        <td>{{ item.question }}</td>
+                                        <td>{{ item.answer[:100] }}{% if item.answer|length > 100 %}...{% endif %}</td>
+                                        <td>{{ item.keywords }}</td>
+                                        <td>
+                                            <div class="btn-group-action">
+                                                <button class="btn-action btn-view edit-btn" data-id="{{ item.id }}" title="编辑这条知识">
+                                                    <span class="action-icon">✏️</span>编辑
+                                                </button>
+                                                <button class="btn-action btn-delete delete-btn" data-id="{{ item.id }}" title="删除这条知识">
+                                                    <span class="action-icon">🗑</span>删除
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加知识模态框 -->
+    <div class="modal fade" id="addKnowledgeModal" tabindex="-1" aria-labelledby="addKnowledgeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addKnowledgeModalLabel">添加知识</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="knowledge-form">
+                        <div class="mb-3">
+                            <label for="question-input" class="form-label">问题</label>
+                            <input type="text" class="form-control" id="question-input" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="answer-input" class="form-label">答案</label>
+                            <textarea class="form-control" id="answer-input" rows="5" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="keywords-input" class="form-label">关键词（用逗号分隔）</label>
+                            <input type="text" class="form-control" id="keywords-input" placeholder="例如：发动机,保养,油耗">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="save-knowledge-btn">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑知识模态框 -->
+    <div class="modal fade" id="editKnowledgeModal" tabindex="-1" aria-labelledby="editKnowledgeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editKnowledgeModalLabel">编辑知识</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-knowledge-form">
+                        <input type="hidden" id="edit-id">
+                        <div class="mb-3">
+                            <label for="edit-question-input" class="form-label">问题</label>
+                            <input type="text" class="form-control" id="edit-question-input" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-answer-input" class="form-label">答案</label>
+                            <textarea class="form-control" id="edit-answer-input" rows="5" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-keywords-input" class="form-label">关键词（用逗号分隔）</label>
+                            <input type="text" class="form-control" id="edit-keywords-input">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="update-knowledge-btn">更新</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 确认删除模态框 -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteConfirmModalLabel">确认删除</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+                </div>
+                <div class="modal-body">
+                    确定要删除这条知识吗？此操作不可恢复。
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-danger" id="confirm-delete-btn">删除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 确认清空模态框 -->
+    <div class="modal fade" id="clearConfirmModal" tabindex="-1" aria-labelledby="clearConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="clearConfirmModalLabel">确认清空</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+                </div>
+                <div class="modal-body">
+                    确定要清空整个知识库吗？此操作不可恢复！
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-danger" id="confirm-clear-btn">清空</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer mt-5 py-3 bg-light">
+        <div class="container text-center">
+            <span class="text-muted">© 2025 汽车知识问答系统</span>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function pageInit() {
+            // 模态框实例
+            const addKnowledgeModal = new bootstrap.Modal(document.getElementById('addKnowledgeModal'));
+            const editKnowledgeModal = new bootstrap.Modal(document.getElementById('editKnowledgeModal'));
+            const deleteConfirmModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            const clearConfirmModal = new bootstrap.Modal(document.getElementById('clearConfirmModal'));
+            
+            // 添加知识
+            document.getElementById('save-knowledge-btn').addEventListener('click', function() {
+                const question = document.getElementById('question-input').value.trim();
+                const answer = document.getElementById('answer-input').value.trim();
+                const keywords = document.getElementById('keywords-input').value.trim();
+                
+                if (!question || !answer) {
+                    alert('问题和答案不能为空！');
+                    return;
+                }
+                
+                fetch('/add_knowledge', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        question: question,
+                        answer: answer,
+                        keywords: keywords
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        addKnowledgeModal.hide();
+                        document.getElementById('knowledge-form').reset();
+                        window.location.reload();
+                    } else {
+                        alert('添加失败: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('添加失败，请稍后再试');
+                });
+            });
+            
+            // 编辑知识按钮点击事件
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    
+                    fetch(`/get_knowledge/${id}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            document.getElementById('edit-id').value = data.id;
+                            document.getElementById('edit-question-input').value = data.question;
+                            document.getElementById('edit-answer-input').value = data.answer;
+                            document.getElementById('edit-keywords-input').value = data.keywords;
+                            
+                            editKnowledgeModal.show();
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('获取知识详情失败');
+                        });
+                });
+            });
+            
+            // 更新知识
+            document.getElementById('update-knowledge-btn').addEventListener('click', function() {
+                const id = document.getElementById('edit-id').value;
+                const question = document.getElementById('edit-question-input').value.trim();
+                const answer = document.getElementById('edit-answer-input').value.trim();
+                const keywords = document.getElementById('edit-keywords-input').value.trim();
+                
+                if (!question || !answer) {
+                    alert('问题和答案不能为空！');
+                    return;
+                }
+                
+                fetch(`/update_knowledge/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        question: question,
+                        answer: answer,
+                        keywords: keywords
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        editKnowledgeModal.hide();
+                        window.location.reload();
+                    } else {
+                        alert('更新失败: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('更新失败，请稍后再试');
+                });
+            });
+            
+            // 删除确认
+            let deleteId = null;
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    deleteId = this.getAttribute('data-id');
+                    deleteConfirmModal.show();
+                });
+            });
+            
+            // 执行删除
+            document.getElementById('confirm-delete-btn').addEventListener('click', function() {
+                if (deleteId) {
+                    fetch(`/delete_knowledge/${deleteId}`, {
+                        method: 'POST'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            deleteConfirmModal.hide();
+                            window.location.reload();
+                        } else {
+                            alert('删除失败: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('删除失败，请稍后再试');
+                    });
+                }
+            });
+            
+            // 清空知识库确认
+            document.getElementById('clear-button').addEventListener('click', function() {
+                clearConfirmModal.show();
+            });
+            
+            // 执行清空
+            document.getElementById('confirm-clear-btn').addEventListener('click', function() {
+                fetch('/clear_knowledge_base', {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        clearConfirmModal.hide();
+                        window.location.reload();
+                    } else {
+                        alert('清空失败: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('清空失败，请稍后再试');
+                });
+            });
+            
+            // 导出知识库
+            document.getElementById('export-button').addEventListener('click', function() {
+                window.location.href = '/export_knowledge';
+            });
+            
+            // 搜索功能
+            document.getElementById('search-button').addEventListener('click', function() {
+                const searchTerm = document.getElementById('search-input').value.trim();
+                if (searchTerm) {
+                    window.location.href = `/knowledge?search=${encodeURIComponent(searchTerm)}`;
+                }
+            });
+            
+            // 回车搜索
+            document.getElementById('search-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    document.getElementById('search-button').click();
+                }
+            });
+        }
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', pageInit);
+} else {
+    pageInit();
+}
+
+    </script>
+    <script src="{{ url_for('static', filename='js/admin-spa.js', v=1) }}"></script>
+</body>
+</html> 

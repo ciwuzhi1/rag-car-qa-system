@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>导入知识 - 汽车知识问答系统</title>
+    <!-- 使用Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=3) }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light navbar-app">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <span class="logo">汽车知识</span> <span class="version">v2.0</span>
+            </a>
+            <div class="d-flex">
+                <a href="/admin" class="nav-link nav-strong">管理员 <span>admin</span></a>
+                <a href="/logout" class="nav-link nav-muted">退出登录</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <!-- 侧边栏 -->
+            <div class="col-md-2">
+                <div class="list-group">
+                    <div class="list-group-header">管理菜单</div>
+                    <a href="/admin" class="list-group-item list-group-item-action">📋 问题管理</a>
+                    <a href="/knowledge" class="list-group-item list-group-item-action">📚 知识库管理</a>
+                    <a href="/upload_knowledge" class="list-group-item list-group-item-action active">📥 导入知识</a>
+                    <a href="/api_keys" class="list-group-item list-group-item-action">🔑 API密钥配置</a>
+                    <a href="/" class="list-group-item list-group-item-action">🏠 返回前台</a>
+                </div>
+            </div>
+
+            <!-- 主内容区 -->
+            <div class="col-md-10">
+                <div class="card">
+                    <div class="card-header card-header-app">
+                        <h3 class="mb-0">导入知识</h3>
+                    </div>
+                    <div class="card-body">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭"></button>
+                            </div>
+                            {% endfor %}
+                        {% endwith %}
+                        <div class="alert alert-info">
+                            <h5>支持导入格式</h5>
+                            <ul>
+                                <li><strong>JSON格式</strong>: 包含question, answer, keywords字段的JSON数组</li>
+                                <li><strong>TXT格式</strong>: 每三行为一组，分别为问题、答案和关键词（可选）</li>
+                                <li><strong>CSV格式</strong>: 包含问题、答案、关键词（可选）三列</li>
+                                <li><strong>Markdown格式</strong>: 使用问题作为标题（##），答案作为内容</li>
+                            </ul>
+                        </div>
+
+                        <!-- 上传文件表单 -->
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        文件上传
+                                    </div>
+                                    <div class="card-body">
+                                        <form action="/upload_knowledge_file" method="post" enctype="multipart/form-data" id="upload-form">
+                                            <div class="mb-3">
+                                                <label for="knowledge-file" class="form-label">选择文件</label>
+                                                <input class="form-control" type="file" id="knowledge-file" name="file" accept=".json,.txt,.csv,.md">
+                                                <div class="form-text">支持JSON, TXT, CSV, Markdown格式</div>
+                                            </div>
+                                            <div class="d-grid">
+                                                <button class="btn btn-primary" type="submit">上传并导入</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        直接输入
+                                    </div>
+                                    <div class="card-body">
+                                        <form id="direct-input-form">
+                                            <div class="mb-3">
+                                                <label for="knowledge-text" class="form-label">输入知识内容</label>
+                                                <textarea class="form-control" id="knowledge-text" rows="10" placeholder="请按照支持的格式输入内容..."></textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="format-select" class="form-label">选择格式</label>
+                                                <select class="form-select" id="format-select">
+                                                    <option value="json">JSON</option>
+                                                    <option value="txt">TXT</option>
+                                                    <option value="csv">CSV</option>
+                                                    <option value="md">Markdown</option>
+                                                </select>
+                                            </div>
+                                            <div class="d-grid">
+                                                <button class="btn btn-primary" type="button" id="import-btn">导入</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 导入日志 -->
+                        <div class="mt-4">
+                            <h4>导入日志</h4>
+                            <div class="border rounded p-3 bg-light">
+                                <div id="import-log">
+                                    {% if logs %}
+                                        {% for log in logs %}
+                                            <div class="log-entry">
+                                                <span class="log-time">{{ log.time }}</span>
+                                                <span class="log-message {% if log.status == 'error' %}text-danger{% elif log.status == 'success' %}text-success{% endif %}">
+                                                    {{ log.message }}
+                                                </span>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="text-muted">暂无导入记录</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer mt-5 py-3 bg-light">
+        <div class="container text-center">
+            <span class="text-muted">© 2025 汽车知识问答系统</span>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function pageInit() {
+            // 文件上传表单提交
+            document.getElementById('upload-form').addEventListener('submit', function(e) {
+                const fileInput = document.getElementById('knowledge-file');
+                if (!fileInput.files.length) {
+                    e.preventDefault();
+                    alert('请选择要上传的文件');
+                }
+            });
+            
+            // 直接输入导入按钮事件
+            document.getElementById('import-btn').addEventListener('click', function() {
+                const knowledgeText = document.getElementById('knowledge-text').value.trim();
+                const format = document.getElementById('format-select').value;
+                
+                if (!knowledgeText) {
+                    alert('请输入知识内容');
+                    return;
+                }
+                
+                fetch('/import_knowledge_text', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: knowledgeText,
+                        format: format
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert(`导入成功，共导入${data.count}条知识`);
+                        // 添加导入日志
+                        const logEntry = document.createElement('div');
+                        logEntry.className = 'log-entry';
+                        logEntry.innerHTML = `
+                            <span class="log-time">${new Date().toLocaleString()}</span>
+                            <span class="log-message text-success">
+                                通过直接输入导入了${data.count}条知识（${format}格式）
+                            </span>
+                        `;
+                        document.getElementById('import-log').prepend(logEntry);
+                        // 清空输入框
+                        document.getElementById('knowledge-text').value = '';
+                    } else {
+                        alert('导入失败: ' + data.message);
+                        // 添加错误日志
+                        const logEntry = document.createElement('div');
+                        logEntry.className = 'log-entry';
+                        logEntry.innerHTML = `
+                            <span class="log-time">${new Date().toLocaleString()}</span>
+                            <span class="log-message text-danger">
+                                导入失败: ${data.message}
+                            </span>
+                        `;
+                        document.getElementById('import-log').prepend(logEntry);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('导入失败，请稍后再试');
+                });
+            });
+            
+            // 根据选择的格式显示示例
+            document.getElementById('format-select').addEventListener('change', function() {
+                const format = this.value;
+                const textarea = document.getElementById('knowledge-text');
+                let placeholder = '';
+                
+                switch (format) {
+                    case 'json':
+                        placeholder = `[
+  {
+    "question": "汽车怎样保养？",
+    "answer": "定期更换机油、检查轮胎气压...",
+    "keywords": "保养,机油,轮胎"
+  },
+  {
+    "question": "汽车发动机工作原理？",
+    "answer": "内燃机通过燃烧燃料产生动力...",
+    "keywords": "发动机,工作原理"
+  }
+]`;
+                        break;
+                    case 'txt':
+                        placeholder = `汽车怎样保养？
+定期更换机油、检查轮胎气压...
+保养,机油,轮胎
+
+汽车发动机工作原理？
+内燃机通过燃烧燃料产生动力...
+发动机,工作原理`;
+                        break;
+                    case 'csv':
+                        placeholder = `问题,答案,关键词
+汽车怎样保养？,定期更换机油、检查轮胎气压...,保养,机油,轮胎
+汽车发动机工作原理？,内燃机通过燃烧燃料产生动力...,发动机,工作原理`;
+                        break;
+                    case 'md':
+                        placeholder = `## 汽车怎样保养？
+
+定期更换机油、检查轮胎气压...
+
+## 汽车发动机工作原理？
+
+内燃机通过燃烧燃料产生动力...`;
+                        break;
+                }
+                
+                textarea.placeholder = placeholder;
+            });
+            
+            // 初始化格式选择示例
+            document.getElementById('format-select').dispatchEvent(new Event('change'));
+        }
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', pageInit);
+} else {
+    pageInit();
+}
+
+    </script>
+    <script src="{{ url_for('static', filename='js/admin-spa.js', v=1) }}"></script>
+</body>
+</html> 

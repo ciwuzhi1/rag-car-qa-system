@@ -1,0 +1,26 @@
+[
+    {
+        "id": "26f07cb6-405b-436a-aa17-b874ec26e2ce",
+        "text": "汽车如何保养？",
+        "time": "2025-05-13 15:32:51",
+        "model": "offline",
+        "keywords": "汽车如何保养",
+        "type": "user_question"
+    },
+    {
+        "id": "deb53d87-54e9-40d1-bc36-6bf6537ba1ea",
+        "text": "电动汽车和燃油车的区别？",
+        "time": "2025-05-13 15:32:55",
+        "model": "suanli",
+        "keywords": "电动汽车和燃油车的区别",
+        "type": "user_question"
+    },
+    {
+        "id": "7fc67fd8-828e-4efd-913d-f5c3be01a6ed",
+        "text": "汽车如何保养？",
+        "time": "2026-08-28 18:58:09",
+        "model": "offline",
+        "keywords": "汽车如何保养",
+        "type": "user_question"
+    }
+]

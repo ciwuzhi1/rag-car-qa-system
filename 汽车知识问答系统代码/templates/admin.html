@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理后台 - 汽车知识问答系统</title>
+    <!-- 使用Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=3) }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light navbar-app">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <span class="logo">汽车知识</span> <span class="version">v2.0</span>
+            </a>
+            <div class="d-flex">
+                <a href="/admin" class="nav-link nav-strong">管理员 <span>admin</span></a>
+                <a href="/logout" class="nav-link nav-muted">退出登录</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <!-- 侧边栏 -->
+            <div class="col-md-2">
+                <div class="list-group">
+                    <div class="list-group-header">管理菜单</div>
+                    <a href="/admin" class="list-group-item list-group-item-action active">📋 问题管理</a>
+                    <a href="/knowledge" class="list-group-item list-group-item-action">📚 知识库管理</a>
+                    <a href="/upload_knowledge" class="list-group-item list-group-item-action">📥 导入知识</a>
+                    <a href="/api_keys" class="list-group-item list-group-item-action">🔑 API密钥配置</a>
+                    <a href="/" class="list-group-item list-group-item-action">🏠 返回前台</a>
+                </div>
+            </div>
+
+            <!-- 主内容区 -->
+            <div class="col-md-10">
+                <div class="card">
+                    <div class="card-header card-header-app">
+                        <h3 class="mb-0">问题管理</h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- 简单统计 -->
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <div class="card stat-card">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">问题总数</h5>
+                                        <p class="card-text display-6 stat-value">{{ questions|length }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card stat-card">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">知识库条目</h5>
+                                        <p class="card-text display-6 stat-value" id="kb-count">--</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card stat-card">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">当前模型</h5>
+                                        <p class="card-text" id="current-model">--</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 问题列表 -->
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>问题内容</th>
+                                        <th>关键词</th>
+                                        <th>时间</th>
+                                        <th>类型</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for question in questions %}
+                                    <tr>
+                                        <td>{{ question.id }}</td>
+                                        <td>{{ question.text }}</td>
+                                        <td>{{ question.keywords }}</td>
+                                        <td>{{ question.time }}</td>
+                                        <td>{{ question.type }}</td>
+                                        <td>
+                                            <div class="btn-group-action">
+                                                <button class="btn-action btn-view" data-action="view" data-text="{{ question.text }}" title="在前台查看该问题">
+                                                    <span class="action-icon">👁</span>查看
+                                                </button>
+                                                <button class="btn-action btn-add" data-action="add" data-text="{{ question.text }}" title="将此问题及答案加入知识库">
+                                                    <span class="action-icon">➕</span>知识库
+                                                </button>
+                                                <button class="btn-action btn-delete" data-action="delete" data-id="{{ question.id }}" title="删除这条提问记录">
+                                                    <span class="action-icon">🗑</span>删除
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer mt-5 py-3 bg-light">
+        <div class="container text-center">
+            <span class="text-muted">© 2025 汽车知识问答系统</span>
+        </div>
+    </footer>
+
+    <!-- 删除确认模态框 -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">确认删除</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+                </div>
+                <div class="modal-body">
+                    确定要删除这个问题吗？此操作不可恢复。
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">删除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let deleteQuestionId = null;
+        
+        function pageInit() {
+            // 获取知识库信息
+            fetch('/api_status')
+                .then(response => response.json())
+                .then(data => {
+                    // 更新知识库计数
+                    document.getElementById('kb-count').textContent = data.knowledge_base_size;
+                    // 更新当前模型
+                    document.getElementById('current-model').textContent = data.current_model;
+                })
+                .catch(error => {
+                    console.error('Error fetching API status:', error);
+                    document.getElementById('kb-count').textContent = "加载失败";
+                    document.getElementById('current-model').textContent = "加载失败";
+                });
+                
+            // 设置删除确认按钮事件
+            document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+                if (deleteQuestionId) {
+                    deleteQuestion(deleteQuestionId);
+                }
+            });
+
+            // 操作按钮：查看 / 加入知识库 / 删除
+            document.querySelectorAll('.btn-action[data-action]').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var act = this.dataset.action;
+                    if (act === 'view') viewQuestion(this.dataset.text);
+                    else if (act === 'add') addToKnowledge(this.dataset.text);
+                    else if (act === 'delete') showDeleteConfirm(this.dataset.id);
+                });
+            });
+        }
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', pageInit);
+} else {
+    pageInit();
+}
+
+        // 查看问题
+        function viewQuestion(question) {
+            localStorage.setItem('pendingQuestion', question);
+            window.location.href = '/';
+        }
+        
+        // 添加到知识库：收集答案与关键词后真实入库
+        function addToKnowledge(question) {
+            const answer = prompt('请输入问题“' + question + '”的答案：');
+            if (answer === null) return;  // 用户取消
+            if (!answer.trim()) {
+                alert('答案不能为空！');
+                return;
+            }
+            const keywords = prompt('请输入关键词（用逗号分隔，可直接留空）：', '') || '';
+
+            fetch('/add_knowledge', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    question: question,
+                    answer: answer.trim(),
+                    keywords: keywords.trim()
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('已成功添加到知识库！在“知识库管理”页面可查看和编辑。');
+                } else {
+                    alert('添加失败: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('添加失败，请稍后再试');
+            });
+        }
+        
+        // 显示删除确认模态框
+        function showDeleteConfirm(questionId) {
+            deleteQuestionId = questionId;
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            deleteModal.show();
+        }
+        
+        // 删除问题
+        function deleteQuestion(questionId) {
+            fetch(`/delete_question/${questionId}`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // 关闭模态框
+                    bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+                    // 刷新页面以显示更新后的问题列表
+                    window.location.reload();
+                } else {
+                    alert('删除失败: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('删除失败，请稍后再试');
+            });
+        }
+    </script>
+    <script src="{{ url_for('static', filename='js/admin-spa.js', v=1) }}"></script>
+</body>
+</html> 

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>常见问题 - 汽车知识问答系统</title>
+    <!-- 使用Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=3) }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light navbar-app">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <span class="logo">汽车知识</span> <span class="version">v2.0</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/faq">常见问题</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/feedback">用户反馈</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <a href="/admin" class="nav-link nav-strong">管理员入口</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="card mb-4">
+            <div class="card-header card-header-app">
+                <h3 class="mb-0">常见问题 (FAQ)</h3>
+            </div>
+            <div class="card-body">
+                <div class="accordion" id="faqAccordion">
+                    <!-- 系统使用相关问题 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                关于系统使用
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <div class="mb-3">
+                                    <strong>问题：如何使用这个系统？</strong>
+                                    <p>回答：在首页的输入框中输入您关于汽车的问题，点击"发送"按钮或按Enter键即可。系统会根据您的问题提供相应的回答。您也可以点击快速问题进行提问。</p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>问题：系统支持哪些类型的问题？</strong>
+                                    <p>回答：本系统主要支持与汽车相关的知识问题，包括但不限于汽车结构、维修保养、驾驶技巧、汽车选购等方面的问题。</p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>问题：如何切换使用不同的模型？</strong>
+                                    <p>回答：在首页上方的"选择模型"区域，您可以选择使用"内置回答"、"智谱GLM"或"OpenAI"几种不同的模型来回答问题。不同模型可能对同一问题有不同的回答深度和角度。</p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>问题：为什么有些模型显示"未连接"？</strong>
+                                    <p>回答：这可能是因为相应的API服务暂时不可用，或者需要配置API密钥。您可以切换到"内置回答"模式，它不需要外部连接即可使用。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 汽车常见问题 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                热门汽车问题
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <div class="mb-3">
+                                    <strong>问题：如何选择适合自己的汽车？</strong>
+                                    <p>回答：选择汽车时需要考虑以下因素：预算范围、使用场景（城市通勤、长途旅行等）、乘坐人数、燃油经济性、安全配置、维护成本等。建议根据这些因素列出优先级，然后在此基础上比较不同车型。</p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>问题：新车需要如何磨合？</strong>
+                                    <p>回答：新车磨合期一般为1500-2000公里，在此期间应：保持发动机转速不超过3000-4000转/分钟，避免急加速和急刹车，不要长时间匀速行驶，避免满载行驶，按时进行首保。磨合好的车辆可以延长使用寿命。</p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>问题：如何判断机油需要更换？</strong>
+                                    <p>回答：判断机油是否需要更换可以通过以下方法：查看机油指示灯是否亮起、检查行驶里程（一般5000-7500公里更换一次）、查看机油颜色（变黑且不透明说明需要更换）、使用机油尺检查机油量和质量。</p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>问题：汽车轮胎气压多少合适？</strong>
+                                    <p>回答：合适的轮胎气压一般在车门边框、油箱盖内侧或说明书中有标注。一般轿车冷胎时气压在220-240kPa较为适宜。气压过低会增加油耗和轮胎磨损，过高会导致行驶硬颠，降低舒适性和轮胎中央过度磨损。</p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>问题：电动汽车和燃油车的区别是什么？</strong>
+                                    <p>回答：主要区别包括：动力来源（电力vs燃油）、能源补充方式（充电vs加油）、环保性（零排放vs有尾气排放）、行驶成本（电费较低vs油费较高）、维护成本（电动车较低）、加速性能（电动车加速更直接）、续航里程（目前燃油车普遍更高）、基础设施（充电站vs加油站）等。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 知识库相关问题 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                关于知识库
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <div class="mb-3">
+                                    <strong>问题：系统的知识库包含哪些内容？</strong>
+                                    <p>回答：本系统的知识库主要包含汽车领域的常见问题及答案，涵盖汽车结构原理、日常维护保养、故障诊断处理、新能源汽车知识、安全驾驶技巧等多个方面。知识库会定期更新以保持信息的准确性和时效性。</p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>问题：如何向知识库贡献内容？</strong>
+                                    <p>回答：您可以通过"用户反馈"页面提交您认为有价值的汽车知识内容。管理员会审核这些内容，合适的内容将被添加到知识库中。您也可以对现有内容提出修改建议。</p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>问题：为什么有些问题系统无法回答？</strong>
+                                    <p>回答：这可能是因为：1) 您的问题超出了汽车知识领域；2) 知识库中暂时没有收录相关内容；3) 问题表述不够清晰。请尝试重新表述您的问题，或在用户反馈中提交这个问题。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 技术问题 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingFour">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                技术与隐私问题
+                            </button>
+                        </h2>
+                        <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <div class="mb-3">
+                                    <strong>问题：系统如何保护用户隐私？</strong>
+                                    <p>回答：本系统尊重用户隐私，我们会记录用户提问以改进服务质量，但不会收集用户个人身份信息。对于使用外部API（如OpenAI）时，我们仅传输问题内容，不传输用户标识信息。</p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>问题：系统使用了哪些技术？</strong>
+                                    <p>回答：本系统基于Python Flask框架开发，前端使用HTML、CSS和JavaScript，支持多种大语言模型(LLM)API调用，包括智谱GLM和OpenAI。系统还包含本地知识库和问答匹配算法。</p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>问题：如何报告系统故障或问题？</strong>
+                                    <p>回答：您可以通过"用户反馈"页面报告系统故障或问题。请尽可能详细地描述您遇到的问题，包括使用环境、操作步骤和错误信息等，这将有助于我们更快地解决问题。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 没找到答案？ -->
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <h4>没有找到您想要的答案？</h4>
+                <p>您可以返回首页提问，或者通过用户反馈提交您的问题。</p>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="/" class="btn btn-primary">返回首页提问</a>
+                    <a href="/feedback" class="btn btn-outline-secondary">提交反馈</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer mt-5 py-3 bg-light">
+        <div class="container text-center">
+            <span class="text-muted">© 2025 汽车知识问答系统</span>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

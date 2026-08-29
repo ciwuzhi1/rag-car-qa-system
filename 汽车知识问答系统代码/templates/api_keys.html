@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API密钥配置 - 汽车知识问答系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=3) }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light navbar-app">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <span class="logo">汽车知识</span> <span class="version">v2.0</span>
+            </a>
+            <div class="d-flex">
+                <a href="/admin" class="nav-link nav-strong">管理后台</a>
+                <a href="/logout" class="nav-link nav-muted">退出登录</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <!-- 侧边栏 -->
+            <div class="col-md-2">
+                <div class="list-group">
+                    <div class="list-group-header">管理菜单</div>
+                    <a href="/admin" class="list-group-item list-group-item-action">📋 问题管理</a>
+                    <a href="/knowledge" class="list-group-item list-group-item-action">📚 知识库管理</a>
+                    <a href="/upload_knowledge" class="list-group-item list-group-item-action">📥 导入知识</a>
+                    <a href="/api_keys" class="list-group-item list-group-item-action active">🔑 API密钥配置</a>
+                    <a href="/" class="list-group-item list-group-item-action">🏠 返回前台</a>
+                </div>
+            </div>
+
+            <!-- 主内容区 -->
+            <div class="col-md-10">
+                <div class="card">
+                    <div class="card-header card-header-app">
+                        <h3 class="mb-0">API密钥配置</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">在此填写大模型服务的 API Key，保存后立即生效（无需重启）。留空提交即可清除已保存的密钥；也可继续使用环境变量方式配置。</p>
+
+                        <div class="row g-3" id="key-cards">
+                            <!-- 智谱GLM -->
+                            <div class="col-md-4">
+                                <div class="key-card" data-provider="zhipu">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h5 class="mb-0">智谱GLM</h5>
+                                        <span class="badge {{ 'bg-success' if configured.zhipu else 'bg-secondary' }}" data-role="status-badge">
+                                            {{ '已配置' if configured.zhipu else '未配置' }}
+                                        </span>
+                                    </div>
+                                    <p class="text-muted small mb-2">当前调用模型 <b>{{ zhipu_model }}</b>，密钥从 open.bigmodel.cn 获取</p>
+                                    <div class="input-group input-group-sm">
+                                        <input type="password" class="form-control" placeholder="{{ masked.zhipu or '粘贴 API Key...' }}" data-role="key-input" aria-label="智谱GLM API Key">
+                                        <button class="btn btn-outline-secondary" type="button" data-role="toggle-btn" title="显示/隐藏">显示</button>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm w-100 mt-2" data-role="save-btn">保存</button>
+                                </div>
+                            </div>
+                            <!-- OpenAI -->
+                            <div class="col-md-4">
+                                <div class="key-card" data-provider="openai">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h5 class="mb-0">OpenAI</h5>
+                                        <span class="badge {{ 'bg-success' if configured.openai else 'bg-secondary' }}" data-role="status-badge">
+                                            {{ '已配置' if configured.openai else '未配置' }}
+                                        </span>
+                                    </div>
+                                    <p class="text-muted small mb-2">当前调用模型 <b>{{ openai_model }}</b>，需可访问的网络环境</p>
+                                    <div class="input-group input-group-sm">
+                                        <input type="password" class="form-control" placeholder="{{ masked.openai or '粘贴 API Key...' }}" data-role="key-input" aria-label="OpenAI API Key">
+                                        <button class="btn btn-outline-secondary" type="button" data-role="toggle-btn" title="显示/隐藏">显示</button>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm w-100 mt-2" data-role="save-btn">保存</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer mt-5 py-3">
+        <div class="container text-center">
+            <span class="text-muted">© 2025 汽车知识问答系统</span>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function pageInit() {
+            document.querySelectorAll('.key-card').forEach(card => {
+                const provider = card.dataset.provider;
+                const input = card.querySelector('[data-role="key-input"]');
+                const toggleBtn = card.querySelector('[data-role="toggle-btn"]');
+                const saveBtn = card.querySelector('[data-role="save-btn"]');
+                const badge = card.querySelector('[data-role="status-badge"]');
+
+                // 显示/隐藏密钥
+                toggleBtn.addEventListener('click', function() {
+                    const hidden = input.type === 'password';
+                    input.type = hidden ? 'text' : 'password';
+                    this.textContent = hidden ? '隐藏' : '显示';
+                });
+
+                // 保存密钥（留空提交 = 清除）
+                saveBtn.addEventListener('click', function() {
+                    const apiKey = input.value.trim();
+                    if (!apiKey && !confirm('输入框为空，确定要清除已保存的密钥吗？')) {
+                        return;
+                    }
+                    saveBtn.disabled = true;
+                    saveBtn.textContent = '保存中...';
+
+                    fetch('/save_api_key', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ provider: provider, api_key: apiKey })
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        saveBtn.disabled = false;
+                        saveBtn.textContent = '保存';
+                        if (data.status === 'success') {
+                            badge.className = 'badge ' + (apiKey ? 'bg-success' : 'bg-secondary');
+                            badge.textContent = apiKey ? '已配置' : '未配置';
+                            input.value = '';
+                            input.placeholder = '已保存';
+                            alert(data.message);
+                        } else {
+                            alert('保存失败: ' + data.message);
+                        }
+                    })
+                    .catch(() => {
+                        saveBtn.disabled = false;
+                        saveBtn.textContent = '保存';
+                        alert('保存失败，请稍后再试');
+                    });
+                });
+            });
+        }
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', pageInit);
+} else {
+    pageInit();
+}
+
+    </script>
+    <script src="{{ url_for('static', filename='js/admin-spa.js', v=1) }}"></script>
+</body>
+</html>
