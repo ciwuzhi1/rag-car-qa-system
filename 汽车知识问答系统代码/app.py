@@ -103,6 +103,12 @@ def init_db():
             key TEXT PRIMARY KEY,
             value TEXT
         );
+        -- RAG 向量持久化：重启服务无需重新编码
+        CREATE TABLE IF NOT EXISTS knowledge_vectors (
+            knowledge_id INTEGER PRIMARY KEY,
+            signature TEXT NOT NULL,
+            embedding BLOB NOT NULL
+        );
     ''')
     # 旧 JSON 数据一次性迁移（仅在对应表为空时导入）
     _migrate_json(conn, KNOWLEDGE_DB_FILE, 'knowledge',
