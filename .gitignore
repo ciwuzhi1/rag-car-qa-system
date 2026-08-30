@@ -8,3 +8,6 @@ __pycache__/
 
 # 编辑器 / 工具目录
 .zcode/
+
+# IDE
+.idea/

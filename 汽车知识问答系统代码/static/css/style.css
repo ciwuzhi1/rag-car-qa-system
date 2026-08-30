@@ -1,3 +1,9 @@
+/* ===== 全站字体：MiSans（小米开放字体，比雅黑更现代精致） ===== */
+@import url('https://cdn.jsdelivr.net/npm/misans@4.0.0/lib/Normal/MiSans-Regular.min.css');
+@import url('https://cdn.jsdelivr.net/npm/misans@4.0.0/lib/Normal/MiSans-Medium.min.css');
+@import url('https://cdn.jsdelivr.net/npm/misans@4.0.0/lib/Normal/MiSans-Semibold.min.css');
+@import url('https://cdn.jsdelivr.net/npm/misans@4.0.0/lib/Normal/MiSans-Bold.min.css');
+
 /* ===== 全局：DeepSeek 风格（#4D6BFE 主色 / 白色面板 / 浅灰背景 / 细边框） ===== */
 :root {
     --primary: #4D6BFE;
@@ -22,7 +28,12 @@ html {
 }
 
 body {
-    font-family: 'Microsoft YaHei', 'PingFang SC', Arial, sans-serif;
+    font-family: 'MiSans', 'Segoe UI', 'PingFang SC', 'HarmonyOS Sans SC', 'Microsoft YaHei UI', 'Microsoft YaHei', Arial, sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.72;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
     background: linear-gradient(135deg, #eef2f7 0%, #e3ecf7 45%, #eef7f3 100%) fixed;
     color: var(--text-main);
     min-height: 100vh;
@@ -126,6 +137,7 @@ body {
 .qa-container h2 {
     font-weight: 700;
     color: var(--text-main);
+    letter-spacing: 0.5px;
 }
 
 /* 模型选择器：色块随点击滑动 */
@@ -305,8 +317,9 @@ body {
 /* ===== 卡片通用 ===== */
 .card {
     border: 1px solid var(--border);
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.05);
+    border-radius: 14px;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04),
+                0 6px 16px rgba(16, 24, 40, 0.04);
     background: var(--bg-surface);
 }
 
@@ -319,6 +332,8 @@ body {
     background: var(--bg-surface) !important;
     color: var(--text-main) !important;
     font-weight: 700;
+    font-size: 1.08rem;
+    letter-spacing: 0.4px;
     padding: 0.95rem 1.35rem;
     position: relative;
 }
@@ -346,6 +361,8 @@ body {
 
 .stat-value {
     font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.5px;
     background: linear-gradient(135deg, #4D6BFE 0%, #7C5CFF 100%);
     -webkit-background-clip: text;
     background-clip: text;
@@ -433,12 +450,24 @@ body {
 
 .table {
     color: var(--text-main);
+    font-size: 0.9rem;
+    margin-bottom: 0;
 }
 
 .table thead th {
     color: var(--text-secondary);
     font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 0.8px;
     border-bottom-color: var(--border);
+    padding: 0.7rem 0.75rem;
+    white-space: nowrap;
+}
+
+.table td {
+    padding: 0.68rem 0.75rem;
+    vertical-align: middle;
+    font-variant-numeric: tabular-nums;
 }
 
 .table-striped > tbody > tr:nth-of-type(odd) > * {
@@ -462,7 +491,8 @@ body {
     border: 1px solid var(--border-strong);
     background: var(--bg-surface);
     color: var(--text-secondary);
-    font-size: 0.82rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.2px;
     padding: 0.28rem 0.7rem;
     border-radius: 8px;
     cursor: pointer;
@@ -574,10 +604,157 @@ body {
 .footer {
     flex-shrink: 0;
     background: transparent;
+    margin-top: 2.5rem !important;
+    padding-top: 1.1rem !important;
+    padding-bottom: 1.1rem !important;
+}
+
+/* 主内容区撑满剩余高度，保证短页页脚也沉底 */
+.container-fluid.mt-4,
+.container.mt-4 {
+    flex: 1 0 auto;
 }
 
 .footer .text-muted {
     color: var(--text-muted) !important;
+}
+
+
+
+/* ===== 全局细滚动条 ===== */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cfd6e4;
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #b4bed2;
+}
+
+/* ===== 模态框统一精修 ===== */
+.modal-content {
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    box-shadow: 0 20px 50px rgba(16, 24, 40, 0.18);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 1.35rem;
+}
+
+.modal-title {
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.modal-body {
+    padding: 1.35rem;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--border);
+    padding: 0.85rem 1.35rem;
+}
+
+/* ===== 表单控件与页面同族 ===== */
+.form-control,
+.form-select {
+    border-radius: 10px;
+    border-color: var(--border-strong);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(77, 107, 254, 0.12);
+}
+
+/* FAQ 手风琴 */
+.accordion-button {
+    font-weight: 600;
+    color: var(--text-main);
+    box-shadow: none;
+}
+
+.accordion-button:not(.collapsed) {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.accordion-button:focus {
+    box-shadow: none;
+    border-color: var(--border);
+}
+
+/* ===== 导入日志条目 ===== */
+.log-entry {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.5rem 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.log-time {
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-family: Consolas, monospace;
+    white-space: nowrap;
+}
+
+.log-message::before {
+    content: '';
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    margin-right: 6px;
+    background: var(--text-muted);
+    vertical-align: middle;
+}
+
+.log-message.text-success::before {
+    background: var(--success);
+}
+
+.log-message.text-danger::before {
+    background: var(--danger);
+}
+
+/* ===== 表格细节 ===== */
+.mono-id {
+    font-family: Consolas, 'Courier New', monospace;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+}
+
+.cell-clip {
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.empty-state {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 2.5rem 1rem !important;
+    background: var(--bg-subtle);
 }
 
 /* ===== 响应式调整 ===== */
