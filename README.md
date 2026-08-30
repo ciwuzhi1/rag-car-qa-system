@@ -1,6 +1,6 @@
 # 汽车知识问答系统 v2.0
 
-基于 Flask 的汽车领域知识问答系统，支持 **bge-m3 向量 RAG 检索回答**、大模型 API 接入（智谱 GLM / OpenAI，界面直接配 Key）、问答记录管理、知识库管理与多格式导入、用户反馈入库、管理后台登录鉴权。界面采用 DeepSeek 风格设计语言（#4D6BFE 品牌蓝紫 + 白色面板 + 渐变点缀）。
+基于 Flask 的汽车领域知识问答系统，支持 **bge-m3 向量 RAG 检索回答**、大模型 API 接入（智谱 GLM / OpenAI，界面直接配 Key）、问答记录管理、知识库管理与多格式导入、用户反馈入库、管理后台登录鉴权。界面采用现代简约蓝色主题设计（品牌蓝 #4D6BFE、蓝色渐变导航栏、白色圆角卡片、浅色系按钮家族，MiSans 字体）。
 
 ## 界面预览
 
@@ -34,7 +34,7 @@
 │   ├── api_keys.html           # API密钥配置页（界面填写智谱/OpenAI密钥）
 │   ├── faq.html                # 常见问题页
 │   └── feedback.html           # 用户反馈页（可勾选将反馈加入知识库）
-├── static/css/style.css        # 全站样式（DeepSeek 风格设计系统，CSS 变量统一管理）
+├── static/css/style.css        # 全站样式（现代蓝色主题设计系统，CSS 变量统一管理）
 └── login.html / dashboard.html # （根目录下）早期静态设计稿，未接入后端，仅供参考
 ```
 
@@ -131,7 +131,7 @@ python app.py
 
 ## 界面风格
 
-全站采用 DeepSeek 风格设计语言，配色与质感由 `static/css/style.css` 顶部的 CSS 变量统一管理：
+全站采用现代简约蓝色主题设计，配色与质感由 `static/css/style.css` 顶部的 CSS 变量统一管理：
 
 - **品牌色**：#4D6BFE 蓝紫（悬停 #3E5BEA，浅底 #ECF0FF），语义色绿/黄/红均为低饱和渐变色块；
 - **页面背景**：淡蓝灰渐变（135°，#eef2f7 → #e3ecf7 → #eef7f3），内容承载于白色圆角面板；

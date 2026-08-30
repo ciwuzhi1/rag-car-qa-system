@@ -4,7 +4,7 @@
 @import url('https://cdn.jsdelivr.net/npm/misans@4.0.0/lib/Normal/MiSans-Semibold.min.css');
 @import url('https://cdn.jsdelivr.net/npm/misans@4.0.0/lib/Normal/MiSans-Bold.min.css');
 
-/* ===== 全局：DeepSeek 风格（#4D6BFE 主色 / 白色面板 / 浅灰背景 / 细边框） ===== */
+/* ===== 全局：现代蓝色主题（#4D6BFE 主色 / 白色面板 / 浅灰背景 / 细边框） ===== */
 :root {
     --primary: #4D6BFE;
     --primary-hover: #3E5BEA;
@@ -58,7 +58,7 @@ body {
     to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ===== 导航栏：DeepSeek 版蓝色渐变 ===== */
+/* ===== 导航栏：蓝色渐变 ===== */
 .navbar-app {
     background: linear-gradient(90deg, #1f2a44 0%, #2c3e64 60%, #2f5d8a 100%) !important;
     border-bottom: none;
