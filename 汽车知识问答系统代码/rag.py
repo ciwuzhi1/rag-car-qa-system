@@ -16,7 +16,7 @@ import sqlite3
 
 # 本地 bge-m3 模型目录（如路径变动，修改此处或设置为环境变量 BGE_M3_PATH）
 MODEL_PATH = os.environ.get(
-    'BGE_M3_PATH', r'D:\尚硅谷day01\资料\LangChain_Day01\2.资料\bge-m3')
+    'BGE_M3_PATH', r'D:\models\bge-m3')
 
 # 向量存储库与应用主库为同一 SQLite 文件
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),

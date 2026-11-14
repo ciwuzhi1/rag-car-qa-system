@@ -76,7 +76,7 @@ Flask app.py
 
 ## RAG 语义检索说明
 
-- **模型**：本地 bge-m3 嵌入模型（1024 维），默认路径 `D:\尚硅谷day01\资料\LangChain_Day01\2.资料\bge-m3`，可通过环境变量 `BGE_M3_PATH` 覆盖；
+- **模型**：本地 bge-m3 嵌入模型（1024 维），默认路径 `D:\models\bge-m3`，可通过环境变量 `BGE_M3_PATH` 覆盖；
 - **向量持久化**：向量存放在 SQLite 的 `knowledge_vectors` 表（knowledge_id + 内容签名 + float32 BLOB），服务重启直接复用、无需重建；只有新增或修改过的条目才会增量编码并写回数据库，已删除条目的向量自动清理；
 - **首次加载**：模型加载约需 15 秒（CPU），发生在第一次提问时，之后不再重复加载；
 - **优雅降级**：模型目录不存在或依赖缺失时，`rag_search` 返回 None，系统自动回退到关键词匹配，功能不受影响；
@@ -109,7 +109,7 @@ python app.py
 | `OPENAI_API_URL` / `OPENAI_MODEL` | OpenAI 接口地址 / 模型名 | 官方地址 / gpt-3.5-turbo |
 | `ZHIPU_API_KEY` | 智谱 GLM 密钥（https://open.bigmodel.cn 获取），配置后可选智谱GLM模型 | 空 |
 | `ZHIPU_API_URL` / `ZHIPU_MODEL` | 智谱接口地址 / 模型名 | open.bigmodel.cn/api/paas/v4 / glm-4.5-air |
-| `BGE_M3_PATH` | RAG 嵌入模型（bge-m3）本地目录 | D:\尚硅谷day01\资料\...\bge-m3 |
+| `BGE_M3_PATH` | RAG 嵌入模型（bge-m3）本地目录 | D:\models\bge-m3 |
 
 密钥也可以不用环境变量：登录管理后台后进入 **「API密钥配置」** 页面（`/api_keys`），直接粘贴保存即可，立即生效无需重启（保存在 SQLite 的 settings 表中，界面配置优先于环境变量；输入框留空提交可清除已保存的密钥）。
 
